@@ -1,7 +1,6 @@
 import {
   Action,
   ActionPanel,
-  List,
   Icon,
   Toast,
   showToast,
@@ -94,7 +93,10 @@ export function useAuth() {
             grant_type: "urn:ietf:params:oauth:grant-type:device_code",
           }),
         });
-        const data = (await res.json()) as any;
+        const data = (await res.json()) as {
+          access_token?: string;
+          error?: string;
+        };
         if (data.access_token) {
           if (!cancelled) {
             await LocalStorage.setItem(GHO_TOKEN_KEY, data.access_token);
@@ -233,7 +235,7 @@ export async function streamChat(
   messages: string | Message[],
   onDelta: (content: string) => void,
   onDone: () => void,
-  onError: (err: any) => void,
+  onError: (err: unknown) => void,
   signal?: AbortSignal,
 ) {
   try {
@@ -291,7 +293,7 @@ export async function streamChat(
     let content = "";
     let buffer = "";
 
-    for await (const chunk of response.body as any) {
+    for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
       if (signal?.aborted) break;
       buffer +=
         typeof chunk === "string"

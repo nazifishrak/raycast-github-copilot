@@ -6,7 +6,15 @@
     "icon": "image.png",
     "author": "nazif",
     "categories": [
-        "Developer Tools"
+        "Developer Tools",
+        "Productivity"
+    ],
+    "keywords": [
+        "ai",
+        "copilot",
+        "github",
+        "chat",
+        "gpt"
     ],
     "license": "MIT",
     "commands": [

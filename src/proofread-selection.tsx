@@ -1,22 +1,12 @@
 import {
   Action,
   ActionPanel,
-  Icon,
-  Toast,
-  showToast,
-  LocalStorage,
   Detail,
   getSelectedText,
   getPreferenceValues,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
-import {
-  useAuth,
-  AuthGate,
-  getCopilotToken,
-  DEFAULT_MODEL_KEY,
-  streamChat,
-} from "./shared";
+import { useAuth, AuthGate, streamChat } from "./shared";
 
 export default function ProofreadSelection() {
   const [markdown, setMarkdown] = useState<string>("");

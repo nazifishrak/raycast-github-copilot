@@ -1,18 +1,6 @@
-import {
-  Action,
-  ActionPanel,
-  Detail,
-  LocalStorage,
-  LaunchProps,
-} from "@raycast/api";
+import { Action, ActionPanel, Detail, LaunchProps } from "@raycast/api";
 import { useEffect, useState } from "react";
-import {
-  useAuth,
-  AuthGate,
-  getCopilotToken,
-  DEFAULT_MODEL_KEY,
-  streamChat,
-} from "./shared";
+import { useAuth, AuthGate, streamChat } from "./shared";
 
 interface QuickAskArguments {
   query: string;

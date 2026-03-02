@@ -12,7 +12,6 @@ import {
   useAuth,
   AuthGate,
   fetchModels,
-  getCopilotToken,
   DEFAULT_MODEL_KEY,
   CopilotModel,
 } from "./shared";
@@ -76,7 +75,6 @@ export default function SetDefaultModel() {
             }
           />
         ))}
-         
       </List>
     </AuthGate>
   );

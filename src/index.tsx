@@ -7,12 +7,11 @@ import {
   showToast,
   LocalStorage,
 } from "@raycast/api";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import {
   useAuth,
   AuthGate,
   fetchModels,
-  getCopilotToken,
   DEFAULT_MODEL_KEY,
   CopilotModel,
   streamChat,
@@ -38,6 +37,16 @@ export default function Command() {
 
   const [models, setModels] = useState<CopilotModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
+  const isCmdNPressed = useRef(false);
+
+  const handleNewChat = () => {
+    isCmdNPressed.current = true;
+    setSearchText("");
+    setActiveChatId("new");
+    setTimeout(() => {
+      isCmdNPressed.current = false;
+    }, 100);
+  };
 
   // Load saved model preference and chat history on startup
   useEffect(() => {
@@ -190,18 +199,6 @@ export default function Command() {
     [messages, ghoToken, selectedModel, chats, activeChatId],
   );
 
-  const compiledMarkdown =
-    messages.length === 0
-      ? "##Type your message below and press `Enter`."
-      : [...messages]
-          .reverse()
-          .map((msg) =>
-            msg.role === "user"
-              ? `---\n**You:**\n\n${msg.content}\n`
-              : `**${Icon.Rocket}:**\n\n${msg.content}\n`,
-          )
-          .join("\n");
-
   const deleteChat = async (id: string) => {
     const newChats = chats.filter((c) => c.id !== id);
     if (activeChatId === id) setActiveChatId("new");
@@ -222,7 +219,8 @@ export default function Command() {
         onSearchTextChange={setSearchText}
         selectedItemId={activeChatId}
         onSelectionChange={(id) => {
-          if (id) setActiveChatId(id);
+          if (isCmdNPressed.current) return;
+          if (id && id !== activeChatId) setActiveChatId(id);
         }}
         isShowingDetail={true}
         filtering={false}
@@ -267,6 +265,12 @@ export default function Command() {
                     />
                   )}
                   <Action
+                    title="Start New Chat"
+                    icon={Icon.PlusCircle}
+                    shortcut={{ modifiers: ["cmd"], key: "n" }}
+                    onAction={handleNewChat}
+                  />
+                  <Action
                     title="Logout"
                     icon={Icon.Logout}
                     onAction={logout}
@@ -310,10 +314,7 @@ export default function Command() {
                         title="Start New Chat"
                         icon={Icon.PlusCircle}
                         shortcut={{ modifiers: ["cmd"], key: "n" }}
-                        onAction={() => {
-                          setActiveChatId("new");
-                          setSearchText("");
-                        }}
+                        onAction={handleNewChat}
                       />
                       <Action
                         title="Delete Chat"
