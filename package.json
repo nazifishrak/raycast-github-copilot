@@ -3,7 +3,7 @@
     "name": "copilot-chat",
     "title": "Copilot Chat",
     "description": "Chat with GitHub Copilot",
-    "icon": "assets/icon.png",
+    "icon": "image.png",
     "author": "nazif",
     "categories": [
         "Developer Tools"
