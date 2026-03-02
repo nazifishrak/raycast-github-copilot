@@ -1,0 +1,78 @@
+{
+    "$schema": "https://www.raycast.com/schemas/extension.json",
+    "name": "copilot-chat",
+    "title": "Copilot Chat",
+    "description": "Chat with GitHub Copilot",
+    "icon": "assets/icon.png",
+    "author": "nazif",
+    "categories": [
+        "Developer Tools"
+    ],
+    "license": "MIT",
+    "commands": [
+        {
+            "name": "index",
+            "title": "Copilot Chat",
+            "description": "Chat with GitHub Copilot",
+            "mode": "view"
+        },
+        {
+            "name": "explain-selection",
+            "title": "Explain Selection",
+            "description": "Send selected text to Copilot with a custom prompt",
+            "mode": "view",
+            "preferences": [
+                {
+                    "name": "customPrompt",
+                    "title": "Custom Prompt",
+                    "description": "The instruction prompt to send to Copilot",
+                    "type": "textfield",
+                    "required": true,
+                    "default": "Please explain the following code/text in detail:"
+                }
+            ]
+        },
+        {
+            "name": "set-model",
+            "title": "Set Default Copilot Model",
+            "description": "Browse and set your default Copilot model",
+            "mode": "view"
+        },
+        {
+            "name": "proofread-selection",
+            "title": "Proofread Selection",
+            "description": "Proofread and improve the selected text with Copilot",
+            "mode": "view",
+            "preferences": [
+                {
+                    "name": "customPrompt",
+                    "title": "Custom Prompt",
+                    "description": "The instruction prompt to send to Copilot",
+                    "type": "textfield",
+                    "required": true,
+                    "default": "Please proofread the following text for grammar, spelling, and clarity. Suggest improvements if necessary:"
+                }
+            ]
+        }
+    ],
+    "dependencies": {
+        "@raycast/api": "^1.86.0",
+        "@raycast/utils": "^1.17.0"
+    },
+    "devDependencies": {
+        "@raycast/eslint-config": "^1.0.11",
+        "@types/node": "20.8.10",
+        "@types/react": "18.3.3",
+        "eslint": "^8.57.0",
+        "prettier": "^3.3.3",
+        "typescript": "^5.4.5"
+    },
+    "scripts": {
+        "build": "ray build -e dist",
+        "dev": "ray develop",
+        "fix-lint": "ray lint --fix",
+        "lint": "ray lint",
+        "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
+        "publish": "npx @raycast/api@latest publish"
+    }
+}
