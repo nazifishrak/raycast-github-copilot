@@ -63,6 +63,20 @@
             ]
         },
         {
+            "name": "analyze-screenshot",
+            "title": "Analyze Screenshot",
+            "description": "Take a screenshot and ask Copilot about it",
+            "mode": "view",
+            "arguments": [
+                {
+                    "name": "prompt",
+                    "placeholder": "What to ask about the screen?",
+                    "type": "text",
+                    "required": true
+                }
+            ]
+        },
+        {
             "name": "quick-ask",
             "title": "Quick Ask Copilot",
             "description": "Quickly ask Copilot anything directly from the Raycast bar",

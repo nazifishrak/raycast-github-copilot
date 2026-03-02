@@ -8,7 +8,7 @@ Chat with GitHub Copilot directly from Raycast.
 - **Explain Selection**: Select code in any app and ask Copilot to explain it.
 - **Proofread Selection**: Improve grammar and clarity of selected text.
 - **Quick Ask**: Ask questions directly from the Raycast command bar.
-- **Model Selection**: Switch between different Copilot models (GPT-4o, etc.).
+- **Model Selection**: Switch between different Copilot models from your own github copilot account.
 
 ## Setup
 
@@ -19,4 +19,4 @@ Chat with GitHub Copilot directly from Raycast.
 
 ## Technical Details
 
-This extension uses GitHub's Copilot API. You must have an active GitHub Copilot subscription to use it.
+This extension uses internal GitHub's Copilot API. So you need to have an active GitHub account with copilot enabled.

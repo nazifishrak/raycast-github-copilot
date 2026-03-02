@@ -227,7 +227,7 @@ export async function fetchModels(ghoToken: string): Promise<CopilotModel[]> {
 }
 export type Message = {
   role: "system" | "user" | "assistant";
-  content: string;
+  content: string | { type: "text" | "image_url"; text?: string; image_url?: { url: string } }[];
 };
 
 export async function streamChat(

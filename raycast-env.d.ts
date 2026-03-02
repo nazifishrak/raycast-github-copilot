@@ -27,6 +27,8 @@ declare namespace Preferences {
   /** Custom Prompt - The instruction prompt to send to Copilot */
   "customPrompt": string
 }
+  /** Preferences accessible in the `analyze-screenshot` command */
+  export type AnalyzeScreenshot = ExtensionPreferences & {}
   /** Preferences accessible in the `quick-ask` command */
   export type QuickAsk = ExtensionPreferences & {}
 }
@@ -40,6 +42,11 @@ declare namespace Arguments {
   export type SetModel = {}
   /** Arguments passed to the `proofread-selection` command */
   export type ProofreadSelection = {}
+  /** Arguments passed to the `analyze-screenshot` command */
+  export type AnalyzeScreenshot = {
+  /** What to ask about the screen? */
+  "prompt": string
+}
   /** Arguments passed to the `quick-ask` command */
   export type QuickAsk = {
   /** Ask anything... */
