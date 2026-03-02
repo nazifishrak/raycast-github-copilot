@@ -89,6 +89,23 @@
                     "required": true
                 }
             ]
+        },
+        {
+            "name": "copilot-status",
+            "title": "Copilot Status",
+            "description": "Status bar item to check Copilot service health",
+            "mode": "menu-bar",
+            "preferences": [
+                {
+                    "name": "enableAutoPing",
+                    "title": "Enable Auto Ping",
+                    "description": "Automatically ping Copilot every 15 minutes to check status",
+                    "type": "checkbox",
+                    "label": "Ping periodically",
+                    "required": false,
+                    "default": false
+                }
+            ]
         }
     ],
     "dependencies": {

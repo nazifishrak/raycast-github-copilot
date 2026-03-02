@@ -237,10 +237,11 @@ export async function streamChat(
   onDone: () => void,
   onError: (err: unknown) => void,
   signal?: AbortSignal,
+  modelOverride?: string,
 ) {
   try {
     const modelToUse =
-      (await LocalStorage.getItem<string>(DEFAULT_MODEL_KEY)) || "gpt-4o";
+      modelOverride || (await LocalStorage.getItem<string>(DEFAULT_MODEL_KEY)) || "gpt-4o";
     const copilotToken = await getCopilotToken(ghoToken);
 
     const formattedMessages =

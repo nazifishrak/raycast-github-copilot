@@ -31,6 +31,11 @@ declare namespace Preferences {
   export type AnalyzeScreenshot = ExtensionPreferences & {}
   /** Preferences accessible in the `quick-ask` command */
   export type QuickAsk = ExtensionPreferences & {}
+  /** Preferences accessible in the `copilot-status` command */
+  export type CopilotStatus = ExtensionPreferences & {
+  /** Enable Auto Ping - Automatically ping Copilot every 15 minutes to check status */
+  "enableAutoPing": boolean
+}
 }
 
 declare namespace Arguments {
@@ -52,5 +57,7 @@ declare namespace Arguments {
   /** Ask anything... */
   "query": string
 }
+  /** Arguments passed to the `copilot-status` command */
+  export type CopilotStatus = {}
 }
 
