@@ -53,6 +53,20 @@
                     "default": "Please proofread the following text for grammar, spelling, and clarity. Suggest improvements if necessary:"
                 }
             ]
+        },
+        {
+            "name": "quick-ask",
+            "title": "Quick Ask Copilot",
+            "description": "Quickly ask Copilot anything directly from the Raycast bar",
+            "mode": "view",
+            "arguments": [
+                {
+                    "name": "query",
+                    "placeholder": "Ask anything...",
+                    "type": "text",
+                    "required": true
+                }
+            ]
         }
     ],
     "dependencies": {

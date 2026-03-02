@@ -27,6 +27,8 @@ declare namespace Preferences {
   /** Custom Prompt - The instruction prompt to send to Copilot */
   "customPrompt": string
 }
+  /** Preferences accessible in the `quick-ask` command */
+  export type QuickAsk = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
@@ -38,5 +40,10 @@ declare namespace Arguments {
   export type SetModel = {}
   /** Arguments passed to the `proofread-selection` command */
   export type ProofreadSelection = {}
+  /** Arguments passed to the `quick-ask` command */
+  export type QuickAsk = {
+  /** Ask anything... */
+  "query": string
+}
 }
 
