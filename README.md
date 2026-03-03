@@ -2,6 +2,8 @@
 
 Chat with GitHub Copilot directly from Raycast.
 
+Use your GitHub Copilot subscription to access powerful AI models. Students get GitHub Copilot pro for free, which gives you free access to top-tier AI in your Raycast!
+
 ## Features
 
 - **Chat interface**: A full chat experience with message history.
