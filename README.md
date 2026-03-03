@@ -10,6 +10,9 @@ Chat with GitHub Copilot directly from Raycast.
 - **Quick Ask**: Ask questions directly from the Raycast command bar.
 - **Model Selection**: Switch between different Copilot models from your own github copilot account.
 
+![alt text](<Raycast 2026-03-02 at 18.36.36.png>)
+![alt text](<copilot-chat 2026-03-02 at 18.37.36.png>)
+![alt text](<copilot-chat 2026-03-02 at 18.38.00.png>)
 ## Setup
 
 1. Open any command (e.g., `Copilot Chat`).
