@@ -180,6 +180,8 @@ export default function Command() {
             });
             setIsLoading(false);
           },
+          undefined,
+          selectedModel,
         );
       } catch (error) {
         showToast({
