@@ -17,6 +17,25 @@
         "gpt"
     ],
     "license": "MIT",
+    "preferences": [
+        {
+            "name": "githubUrl",
+            "title": "GitHub URL",
+            "description": "Base URL of your GitHub instance, e.g. https://github.com, https://<org>.ghe.com or https://github.example.com (GitHub Enterprise Server)",
+            "type": "textfield",
+            "required": false,
+            "default": "https://github.com",
+            "placeholder": "https://github.com"
+        },
+        {
+            "name": "clientId",
+            "title": "OAuth Client ID",
+            "description": "Optional OAuth app client ID for the device login flow. Leave empty to use the default Copilot client ID.",
+            "type": "textfield",
+            "required": false,
+            "placeholder": "01ab8ac9400c4e429b23"
+        }
+    ],
     "commands": [
         {
             "name": "index",
