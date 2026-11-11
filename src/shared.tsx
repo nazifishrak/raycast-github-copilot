@@ -8,21 +8,68 @@ import {
   Detail,
   Clipboard,
   open,
+  getPreferenceValues,
 } from "@raycast/api";
 import { useEffect, useState, useRef } from "react";
 
-const clientId = "01ab8ac9400c4e429b23";
-const GHO_TOKEN_KEY = "gho_token";
+const DEFAULT_CLIENT_ID = "01ab8ac9400c4e429b23";
+const DEFAULT_GITHUB_URL = "https://github.com";
+const DEFAULT_COPILOT_API = "https://api.githubcopilot.com";
 export const DEFAULT_MODEL_KEY = "default_model";
 
-let copilotTokenCache: { token: string; expiresAt: number } | null = null;
+type GitHubPreferences = { githubUrl?: string; clientId?: string };
 
-export async function getCopilotToken(ghoToken: string): Promise<string> {
-  if (copilotTokenCache && copilotTokenCache.expiresAt > Date.now()) {
-    return copilotTokenCache.token;
+export function getEndpoints() {
+  const prefs = getPreferenceValues<GitHubPreferences>();
+  const raw = (prefs.githubUrl || DEFAULT_GITHUB_URL).trim();
+  const url = new URL(/^https?:\/\//.test(raw) ? raw : `https://${raw}`);
+  const host = url.hostname.toLowerCase();
+  const webBase = `${url.protocol}//${url.host}`;
+
+  let apiBase: string;
+  if (host === "github.com") {
+    apiBase = "https://api.github.com";
+  } else if (host.endsWith(".ghe.com")) {
+    apiBase = `${url.protocol}//api.${url.host}`;
+  } else {
+    apiBase = `${webBase}/api/v3`;
   }
 
-  const res = await fetch("https://api.github.com/copilot_internal/v2/token", {
+  return {
+    host,
+    webBase,
+    apiBase,
+    clientId: prefs.clientId?.trim() || DEFAULT_CLIENT_ID,
+  };
+}
+
+function tokenKey() {
+  const { host } = getEndpoints();
+  return host === "github.com" ? "gho_token" : `gho_token:${host}`;
+}
+
+let copilotTokenCache: {
+  token: string;
+  expiresAt: number;
+  apiBase: string;
+  ghoToken: string;
+  host: string;
+} | null = null;
+
+async function getCopilotSession(
+  ghoToken: string,
+): Promise<{ token: string; apiBase: string }> {
+  const { apiBase, host } = getEndpoints();
+  if (
+    copilotTokenCache &&
+    copilotTokenCache.expiresAt > Date.now() &&
+    copilotTokenCache.ghoToken === ghoToken &&
+    copilotTokenCache.host === host
+  ) {
+    return copilotTokenCache;
+  }
+
+  const res = await fetch(`${apiBase}/copilot_internal/v2/token`, {
     headers: {
       Authorization: `token ${ghoToken}`,
       Accept: "application/json",
@@ -35,12 +82,23 @@ export async function getCopilotToken(ghoToken: string): Promise<string> {
     throw new Error(`Failed to exchange Copilot token: ${text}`);
   }
 
-  const data = (await res.json()) as { token: string; expires_at: number };
+  const data = (await res.json()) as {
+    token: string;
+    expires_at: number;
+    endpoints?: { api?: string };
+  };
   copilotTokenCache = {
     token: data.token,
     expiresAt: data.expires_at * 1000,
+    apiBase: (data.endpoints?.api || DEFAULT_COPILOT_API).replace(/\/+$/, ""),
+    ghoToken,
+    host,
   };
-  return data.token;
+  return copilotTokenCache;
+}
+
+export async function getCopilotToken(ghoToken: string): Promise<string> {
+  return (await getCopilotSession(ghoToken)).token;
 }
 
 export type CopilotModel = {
@@ -65,7 +123,7 @@ export function useAuth() {
     if (startedRef.current) return;
     startedRef.current = true;
 
-    LocalStorage.getItem<string>(GHO_TOKEN_KEY).then((token) => {
+    LocalStorage.getItem<string>(tokenKey()).then((token) => {
       if (token) {
         setGhoToken(token);
       } else {
@@ -81,25 +139,28 @@ export function useAuth() {
     const poll = async () => {
       if (!deviceFlow || cancelled) return;
       try {
-        const res = await fetch("https://github.com/login/oauth/access_token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+        const res = await fetch(
+          `${getEndpoints().webBase}/login/oauth/access_token`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              client_id: getEndpoints().clientId,
+              device_code: deviceFlow.device_code,
+              grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+            }),
           },
-          body: JSON.stringify({
-            client_id: clientId,
-            device_code: deviceFlow.device_code,
-            grant_type: "urn:ietf:params:oauth:grant-type:device_code",
-          }),
-        });
+        );
         const data = (await res.json()) as {
           access_token?: string;
           error?: string;
         };
         if (data.access_token) {
           if (!cancelled) {
-            await LocalStorage.setItem(GHO_TOKEN_KEY, data.access_token);
+            await LocalStorage.setItem(tokenKey(), data.access_token);
             setGhoToken(data.access_token);
             showToast({ style: Toast.Style.Success, title: "Authenticated!" });
           }
@@ -130,7 +191,7 @@ export function useAuth() {
   }, [deviceFlow, ghoToken]);
 
   const logout = async () => {
-    await LocalStorage.removeItem(GHO_TOKEN_KEY);
+    await LocalStorage.removeItem(tokenKey());
     setGhoToken(null);
     startedRef.current = false;
     startDeviceFlow(setDeviceFlow);
@@ -141,13 +202,16 @@ export function useAuth() {
 
 async function startDeviceFlow(setDeviceFlow: (d: DeviceFlowResponse) => void) {
   try {
-    const res = await fetch("https://github.com/login/device/code", {
+    const res = await fetch(`${getEndpoints().webBase}/login/device/code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify({ client_id: clientId, scope: "read:user" }),
+      body: JSON.stringify({
+        client_id: getEndpoints().clientId,
+        scope: "read:user",
+      }),
     });
     const data = (await res.json()) as DeviceFlowResponse;
     setDeviceFlow(data);
@@ -206,8 +270,8 @@ Waiting for you to authorize...
 }
 
 export async function fetchModels(ghoToken: string): Promise<CopilotModel[]> {
-  const copilotToken = await getCopilotToken(ghoToken);
-  const res = await fetch("https://api.githubcopilot.com/models", {
+  const { token: copilotToken, apiBase } = await getCopilotSession(ghoToken);
+  const res = await fetch(`${apiBase}/models`, {
     headers: {
       Authorization: `Bearer ${copilotToken}`,
       "Editor-Version": "vscode/1.83.1",
@@ -228,12 +292,12 @@ export async function fetchModels(ghoToken: string): Promise<CopilotModel[]> {
 export type Message = {
   role: "system" | "user" | "assistant";
   content:
-    | string
-    | {
-        type: "text" | "image_url";
-        text?: string;
-        image_url?: { url: string };
-      }[];
+  | string
+  | {
+    type: "text" | "image_url";
+    text?: string;
+    image_url?: { url: string };
+  }[];
 };
 
 export async function streamChat(
@@ -250,32 +314,29 @@ export async function streamChat(
       modelOverride ||
       (await LocalStorage.getItem<string>(DEFAULT_MODEL_KEY)) ||
       "gpt-4.1";
-    const copilotToken = await getCopilotToken(ghoToken);
+    const { token: copilotToken, apiBase } = await getCopilotSession(ghoToken);
 
     const formattedMessages =
       typeof messages === "string"
         ? [{ role: "user", content: messages }]
         : messages;
 
-    const response = await fetch(
-      "https://api.githubcopilot.com/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${copilotToken}`,
-          "Editor-Version": "vscode/1.83.1",
-          "Editor-Plugin-Version": "copilot-chat/0.8.0",
-          "User-Agent": "GitHubCopilotChat/0.8.0",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: formattedMessages,
-          stream: true,
-          model: modelToUse,
-          intent: true,
-        }),
+    const response = await fetch(`${apiBase}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${copilotToken}`,
+        "Editor-Version": "vscode/1.83.1",
+        "Editor-Plugin-Version": "copilot-chat/0.8.0",
+        "User-Agent": "GitHubCopilotChat/0.8.0",
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        messages: formattedMessages,
+        stream: true,
+        model: modelToUse,
+        intent: true,
+      }),
+    });
 
     if (!response.ok) {
       const text = await response.text();

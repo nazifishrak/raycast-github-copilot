@@ -7,7 +7,12 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 
-type ExtensionPreferences = {}
+type ExtensionPreferences = {
+  /** GitHub URL - Base URL of your GitHub instance, e.g. https://github.com, https://<org>.ghe.com or https://github.example.com (GitHub Enterprise Server) */
+  "githubUrl": string,
+  /** OAuth Client ID - Optional OAuth app client ID for the device login flow. Leave empty to use the default Copilot client ID. */
+  "clientId"?: string
+}
 
 /** Preferences accessible in all the extension's commands */
 declare type Preferences = ExtensionPreferences
